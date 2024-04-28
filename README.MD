@@ -222,6 +222,19 @@ module.exports = model("User", UserSchema);
 ```
 
 <p>un <code style="color: cyan">Schema</code> no es mas que la definición de un objeto que tendra la estructura de cada uno de los registros de la tabla de la base de datos. Una base de datos puede tener muchas tablas, la cual tendra pares de <code style="color: cyan">clave-valor</code> que se definen en el <code style="color: cyan">Schema</code>. Asi al grabar el registro se creara un objeto con los valores definidos en el <code style="color: cyan">Schema</code>.</p>
+
+</li>
+<li>
+<p>
+  Ahora tenemos que importar el schema creado, con el nombre con el que lo exportamos:
+
+```javascript
+const User = require("../models/UserModel");
+```
+
+</p>
+</li>
+<li>
 <p>Seguidamente definimos el codigo para la grabación dentro de el controlador <code style="color: yellow">createAuth</code> quedando el codigo de la siguiente manera:
 
 ```javascript
@@ -259,6 +272,9 @@ const createAuth = async (req, res = response) => {
   </li>
 
 </ul>
+
+- Como diseñar un schema:
+  <https://apuntes.de/nodejs-desarrollo-web/esquemas-en-mongoose/#gsc.tab=0> (¿Que es y para que se utiliza?)
 
 # Encriptando la contraseña:
 
