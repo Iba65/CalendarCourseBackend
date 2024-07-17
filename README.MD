@@ -1,3 +1,184 @@
+# Express Validator
+
+<p>Cuando se maneja información recibida desde el front vamos a querer validar que lo que nos llegue sea exactamente lo que estamos esperando. Para esto express tiene un paquete para validar la información que llegua al servidor a traves del <code style="color: cyan">body</code> o de las <code style="color: cyan">query</code>.</p>
+<p>Pero para poder usarlo hay que instalar la libreria o el paquete: 
+  <span style="background-color:white;  color:maroon; font-weight: 700;">&nbsp><i>npm i express-validator</i>&nbsp</span>
+</p>
+
+## <br />
+
+<p><b>Para mas información sobre express-validator y como usar sus middlewares</b>:
+
+### <https://express-validator.github.io/docs> (Documentacion)
+
+### <https://express-validator.github.io/docs/api/check> (Como usar los middlewares)
+
+##
+
+<br/>
+<p> Por otro lado para usar la libreria una vez instalada, como se entendera, hay que importarlo:
+
+```javascript
+const { check } = require("express-validator");
+```
+
+</p>
+<br />
+
+## Como implementar un middleware
+
+<p>Se puede implementar de dos maneras:</p>
+<ul>
+  <li>
+    Como una función:
+    <p>Para ello en la ruta donde deseamos implementar la validación le pasariamos la funcion de validación como un parametro:</p>
+
+```javascript
+router.post("/new", funcValidar, crearUsuario);
+```
+
+   <p>Donde <code style="color: yellow">funcValidar</code> seria la función de validación y <code style="color: yellow">crearUsuario</code> seria la función del controlador.</p>
+  </li>
+  <li>
+    Como una array de middlewares:
+    <p>Este array tambien lo incluiriamos como segundo parametro. El numero de validaciones no tiene limites, podemos incluir cuantas queramos. Codigo ejemplo:</p>
+
+```javascript
+router.post(
+  "/new",
+  [
+    check("name", "El nombre es obligatorio").not().isEmpty(),
+    check("email", "El email es obligatorio").not().isEmpty(),
+    check("email", "El email no tiene un formato correcto").isEmail(),
+    check(
+      "password",
+      "El password debe de ser de minimo 6 caracteres"
+    ).isLength({ min: 6 }),
+  ],
+  createAuth
+);
+```
+
+   <p>Este metodo del <code style="color: yellow">express-validator</code> 'captura' el error que se produce cuando la validación especificada falla. Pero esto no seria util si no hacemos algo con ese error capturado</p>
+   <p>Para ello tenemos que importar el metodo <code style="color: yellow">validationResult</code> en el controlador donde vamos a gestionar los errores:</p>
+
+```javascript
+const { validationResult } = require("express-validator");
+```
+
+  <p>Y en la función del controlador (en nuestro caso seria <code style="color: yellow">createAuth</code>) capturamos los errores y los gestionamos como deseemos. Como por ejemplo:</p>
+
+```javascript
+const myErrors = validationResult(req);
+```
+
+   <p>Donde <code style="color: cyan">myErrors</code> recibira un objeto en el cual, el elemento <code style="color: cyan">errors</code> contendra un array de objetos con los errores.</p>
+  <p>Si pintaramos el contenido de <code style="color: cyan">errors</code>, veriamos algo como esto:</p>
+
+```javascript
+Result {
+  formatter: [Function: formatter],
+  errors: [
+    {
+      value: undefined,
+      msg: 'El nombre es obligatorio',
+      param: 'name',
+      location: 'body'
+    }
+  ]
+}
+```
+
+  <p>En caso de no producirse los errores, el elemento <code style="color: cyan">errors</code> vendrá como un array vacio. Sabiendo esto ya podemos hacer una validación comprobando si el array de errores esta vacio o con errores:</p>
+
+```javascript
+if (!errors.isEmpty()) {
+  return res.status(400).json({
+    ok: false,
+    errors: errors.mapped(),
+  });
+}
+```
+
+  </li>
+</ul>
+<br />
+
+## Middleware personalizados
+
+<p>Una buena praxis es no gestionar los errores en la función del controlador, sino en un middleware personalizado, y asi, si hay errores no pasara a la función del controlador. Y por otro lado, la función del controlador quedara lo mas limpia posible.</p>
+<p>
+  Para ello vamos a hacer lo siguiente:
+  <ul>
+    <li>
+      <p>Creamos una carpeta nueva en la raiz del proyecto con el nombre <code style="color: yellow">middlewares</code>. En ella cremos nuestro middleware personalizado, el cual podriamos llamarlo <code style="color: yellow">fields-validator.js</code>(aunque, el nombre va a eleccion personal). En el middleware ejemplo contendrá el siguiente código:</p>
+    </li>
+
+```javascript
+const { response } = require("express");
+const { validationResult } = require("express-validator");
+
+const validateFields = (req, res = response, next) => {
+  // manejo de errores
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      ok: false,
+      errors: errors.mapped(),
+    });
+  }
+  next();
+};
+
+module.exports = {
+  validateFields,
+};
+```
+
+  <li>
+    <p>Ahora para usar nuestro middleware personalizado lo importamos en el fichero de rutas donde estamos haciendo las validaciones:</p>
+  </li>
+
+```javascript
+const { validateFields } = require("../middlewares/fields-validator");
+```
+
+  <li>
+    <p>Y ponemos el middleware personalizado como ultimo valor dentro del array de diddlewares o array de validaciones:</p>
+  </li>
+
+```javascript
+router.post(
+  "/new",
+  [
+    check("name", "El nombre es obligatorio").not().isEmpty(),
+    check("email", "El email es obligatorio").not().isEmpty(),
+    check("email", "El email no tiene un formato correcto").isEmail(),
+    check(
+      "password",
+      "El password debe de ser de minimo 6 caracteres"
+    ).isLength({ min: 6 }),
+    validateFields,
+  ],
+  createAuth
+);
+```
+
+  </ul>
+</p>
+
+### Entendiendo el codigo del Middleware personalizados
+
+<p>Como podemos observar en los parametros que recibe la función del middleware personalizado, tenermos tres valores. ¿que significan y para que se usan?</p>
+<ul>
+  <li><b><code style="color: cyan">req</code></b>: Como ya hemos visto el <code style="color: cyan">req</code> contine los datos que son requeridos al usuario, los cuales pueden venir por el <code style="color: cyan">body</code> o por las <code style="color: cyan">query</code>. </li>
+  <li><b><code style="color: cyan">res = response</code></b>: El <code style="color: cyan">res</code> tambien es conocido por su uso y contendra la respuesta. Pero en este caros importamos <code style="color: cyan">response</code> y lo pasamos como valor solo con la intención de obtener la ayuda del tipado al escribir el codigo. Podriamos dejarlo solo con el parametro <code style="color: cyan">res</code>. </li>
+  <li><b><code style="color: cyan">next</code></b>: Y por ultimo el parametro <code style="color: cyan">next</code> se va a encargar de llamar a la siguiente linea de codigo despues de ejecutarse la anterior. En el caso ejemplo que estamos tratando, primero se ejecutaria la linea del <code style="color: cyan">check</code> del <code style="color: yellow">name</code>, y next pasaria a la siguiente, y asi hasta llegar a la funcion personalizada del middleware. </li>
+
+  </ul>
+<br /><br />
+
 # Creacion de la base de datos
 
 ### <https://www.restapitutorial.com/httpstatuscodes.html> (Codigo de estado en peticiones HTTP)
@@ -8,113 +189,140 @@
 
 <ul>
   <li>
+    <p>En lapagina oficial de mongodb, indicada arriba, seleccionamos "prueba gratuita" o "Try free", dependiendo del lenguage con la que abramos la pagina:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/01-inicialMongoAtlas.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/01-inicialMongoAtlas.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Rellenamos toda la inforamación solicitada para crear una cuenta:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/01a-MongoDB Atlas _ MongoDB.png" alt="JuveYell" width="300px">
+      <img src="./docum/01a-MongoDB Atlas _ MongoDB.png" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Seguidamente verificamos el email de la cuenta en nuestro correo electronico:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/01b-verifyEmail.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/01b-verifyEmail.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Rellenamos el formulario que nos solicita para saber para que vamos a utilizar mongodb_</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/02-cuestionario.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/02-cuestionario.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Y una vez que estamos registrados y entramos en la cuenta veremos una pantalla igual o simililar a esta:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/03-CreateDB.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/03-CreateDB.jpg" alt="JuveYell" width="600px">
+    </p>
+    <p>- En el grupo DESPLIEGUE seleccionamos la opción Base de datos.</p>
+    <p>- Y seguidamente pinchamos en la opción construir una base de datos.</p>
+  </li>
+  <li>
+    <p>Seguidamente nos va a sugerir que seleccionemos la opción de configuración de nuestra base de datos. De momento lo dejamos sin seleccionar y indicamos que lo haremos mas tarde:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/04-jumpage.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Cuando el proceso de creación de la base de datos termine, podremos conectarnos a la base de datos recien creada en el botón connect:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/04-jumpage.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/05-inicialDbCreate.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Seguidamente nos va a pedir que creemos un usuario para la base de datos, o un administrador de la base de datos, pero de momento este paso no lo hacemos, pues lo haremos mas adelante:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/05-inicialDbCreate.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/05a-cancelProcess.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Ahora si, ahora escogemos la configuración de la base de datos:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/05a-cancelProcess.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/06-creaciondbform.jpg" alt="JuveYell" width="600px">
+    </p>
+    <p>- Opción gratuita.</p>
+    <p>- En "name" especificamos el nombre de nuestra base de datos, que no sea complicado.</p>
+    <p>- Y dejamos la configuración sugerida, ya que la configuración que nos ofrece suele ser la mas cercana a nosotros y la mejor opción:</p>
+  </li>
+  <li>
+    <p>Seguidamente ahora creamos el usuario o el administrador de la base de datos:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/07-cearUserGenerico.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Vamos a cambiar el modo de conexión ya que utilizaremos la herramienta de mongo, mongodb compas, que nos facilitara el manejo de la base de datos:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/06-creaciondbform.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/08-cearUserGenericoOk.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Seleccionamos como indicamos mongodb compas:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/07-cearUserGenerico.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/09-metodoConexion.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Dependiendo de si no lo tenemos instalado o si, elegimos la opcion. De no tenerlo instalado, elegimos el instalador de windows msi y lo instalamos: </p>
     <p style = 'text-align:center;'>
-      <img src="./docum/08-cearUserGenericoOk.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/10-metodoConexionCompas.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Una vez instalado, lo abrimos para establecer la conexión de la base de datos:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/09-metodoConexion.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/11-MongoDbCompas.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Indicamos que queremos editar la conexión de la base de datos. Y ponemos los datos de conexión de nuestra base de datos. Esta información nos la proporciona mongodb cuando pulsamos el boton connect:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/10-metodoConexionCompas.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/12-conexionCompas.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Creamos nuestro usuario para la conexión de la base de datos.</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/11-MongoDbCompas.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/13-crearusuarioinicial.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Establecemos la clave o generamos una segura:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/12-conexionCompas.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/14-crearusuarioinicialForm1.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Indicamos que queremos la base de datos de lectura y escritura:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/13-crearusuarioinicial.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/15-crearusuarioinicialForm2.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Y creamos el usuario:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/14-crearusuarioinicialForm1.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/16-crearusuarioinicialForm2.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>En mongo atlas pulsamos en conecctar y ya deberiasmos ver la información de la base de datos:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/15-crearusuarioinicialForm2.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/17-probarConexion.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Info de la base de datos:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/16-crearusuarioinicialForm2.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/18-ConexionOk.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
   <li>
+    <p>Lo guardamos en favoritos para proximas conexiones:</p>
     <p style = 'text-align:center;'>
-      <img src="./docum/17-probarConexion.jpg" alt="JuveYell" width="300px">
-    </p>
-  </li>
-  <li>
-    <p style = 'text-align:center;'>
-      <img src="./docum/18-ConexionOk.jpg" alt="JuveYell" width="300px">
-    </p>
-  </li>
-  <li>
-    <p style = 'text-align:center;'>
-      <img src="./docum/19-guardarconexionFavoritos.jpg" alt="JuveYell" width="300px">
+      <img src="./docum/19-guardarconexionFavoritos.jpg" alt="JuveYell" width="600px">
     </p>
   </li>
 </ul>
@@ -124,11 +332,11 @@
 <p>Vamos a instalar el codigo tomado de la pagina de <a href="https://mongoosejs.com/">Mongoose </a> donde usaremos la configuración que se nos aconseja:</p>
 <div>
 <p style = 'text-align:center;'>
-<img src="./docum/101mongooseWeb.jpg" alt="JuveYell" width="300px">
+<img src="./docum/101mongooseWeb.jpg" alt="JuveYell" width="600px">
 </p>
 </div>
 <ul>
-  <li><p>Primero intalaremos la libreria en nuestro proyecto: 
+  <li><p>Primero intalaremos la libreria en nuestro proyecto:
   <span style="background-color:white;  color:maroon; font-weight: 700;">&nbsp><i>npm i mongoose</i>&nbsp</span></p></li>
   <li><p>
   Segundo creamos una nueva carpeta en el directorio raiz del proyecto llamado <code style="color: yellow">database</code>, y en la carpeta creada un archivo llamado <code style="color: yellow">config.js</code>. <br/><br/> En dicho archivo creado escribimos el siguiente codigo:
@@ -172,7 +380,7 @@ const app = express();
 dbConnection();
 
 // directorio publico
-// use()-> middelware -> una funcion que se ejecuta cuando alguien hacer una petición al servidor.
+// use()-> middleware -> una funcion que se ejecuta cuando alguien hacer una petición al servidor.
 app.use(express.static("public"));
 
 // lectura y parseo del body
@@ -421,7 +629,7 @@ res.status(201).json({
   </li>
 </ul>
 
-# Revlidar un JWT
+# Revalidar un JWT
 
 <p>
   Un JWT esta creado con la intención de limitar el tiempo de uso de una aplicación para evitar el abuso y el mal uso de la misma. Es decir, no solo se comprueba si el usuario logueado es el correcto, sino que al limite de un tiempo no pueda seguir usando la app. Para poder seguir utilizandola hace falta revalidar el token, es decir, volver a generar un token y pasar una nueva validación.
@@ -447,7 +655,7 @@ const validarJWT = (req, res = response, next) => {
   }
   try {
     // se obtiene el payload que se paso en la creacion del JWT
-    const payload = jw.varify(token, process.env.SECRET_JWT_SEED);
+    const payload = jw.verify(token, process.env.SECRET_JWT_SEED);
     req.uid = payload.uid;
     req.name = payload.name;
   } catch (error) {

@@ -5,15 +5,11 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/UserModel");
 const { generateJWT } = require("../helpers/jwt");
 
-const getAuths = (req, res = response) => {
+const getAuths = async (req, res = response) => {
+  const users = await User.find();
   res.json({
-    data: {
-      iduser: "jw123456",
-      abatus: "imba65",
-      nameus: "Ignacio Miguel Ballester",
-      emailus: "naxo.ballester.1965@gmail.com",
-      datus: "01/01/2024",
-    },
+    ok: true,
+    msg: users,
   });
 };
 
@@ -37,7 +33,7 @@ const createAuth = async (req, res = response) => {
     await user.save();
 
     // Generar el JWT
-    const token = await generateJWT(user.id, user.name);
+    const token = await generateJWT(user.id, user.name).then().catch();
 
     res.status(201).json({
       user: {

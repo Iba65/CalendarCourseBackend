@@ -32,6 +32,7 @@ app.use("/api/auth", require("./routes/auth"));
     OK: true,
   });
 });*/
+app.use("/api/events", require("./routes/events"));
 
 //const PORT = 4000;
 app.listen(process.env.PORT, () => {

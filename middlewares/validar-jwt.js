@@ -11,7 +11,7 @@ const validarJWT = (req, res = response, next) => {
       msg: "Fallo en autenticación del usuario.",
     });
   }
-  console.log(req.uid, req.name, process.env.SECRET_JWT_SEED);
+  //console.log(req.uid, req.name, process.env.SECRET_JWT_SEED);
   try {
     // se obtiene el payload que se paso en la creacion del JWT
     const payload = jwt.verify(token, process.env.SECRET_JWT_SEED);
