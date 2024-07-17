@@ -744,3 +744,31 @@ app.use(cors());
 
 </ul>
 </div>
+
+# Subir la api a un servidor
+
+## Configuración de Railway
+
+## Subida a Github
+
+<ul>
+  <li>
+    <h1>Subir proyecto a github:</h1>
+    <p>Lo primero es crear el repositorio:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/New repository.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+  <p>De no tener el archivo <code style="color: yellow">.gitignore</code> lo creamos en la carpeta principal del proyecto. Y si lo tenemos aseguremonos de tener las lineas <code style="color: cyan">node_modules/</code> y <code style="color: cyan">.env</code> en el archivo. De tener que crerlo configuremoslos con esas lineas como minimo:</p>
+
+```javascript
+node_modules/
+.env
+```
+
+  </li>
+</ul>
+## Configuración de variables de entorno
+
+## Prueba del backend en la nube
