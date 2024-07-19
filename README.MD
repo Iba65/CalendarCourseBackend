@@ -747,8 +747,6 @@ app.use(cors());
 
 # Subir la api a un servidor
 
-## Configuración de Railway
-
 ## Subida a Github
 
 <ul>
@@ -768,7 +766,141 @@ node_modules/
 ```
 
   </li>
-</ul>
-## Configuración de variables de entorno
+  <li>
+    <p>Seguidamente abrimos la terminal de vsc y ajecutamos los siguientes comandos de git:</p>
 
-## Prueba del backend en la nube
+```javascript
+git init
+git add .
+git commit -m "First commit"
+git remote add origin https://github.com/Iba65/Calendar-MERN-backend.git
+git branch -M main
+git push -u origin main
+.env
+```
+
+  </li>
+</ul>
+
+## Configuración de Railway
+
+<ul>
+  <li>
+    <p>Para subir nuestro proyecto nodejs a un servidor vamos a utilizar Railway:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/Railway.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Para registrarnos pinchamos en login y teniendo la cuenta de hithub abierta indicamos que queremos registrarnos con la cuenta de git, ya que asi sera mas facil subir el proyecto. Seguidamente veremos mas o menos las pantallas de validaciones:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/RailwayRegistro1.png" alt="JuveYell" width="600px">
+    </p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/RailwayRegistro2.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Y llegaremos a la pantalla principal:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/RailwayDashboard.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Pero como no queremos una cuenta de pago. Vovemos a la pantalla principal y pinchamos en el Boton Start a New Project:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/RailwayApp.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Y seleccionamos la opcion que Deploy from GitHub repo</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/New_projectRailway.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Seleccionamos Configure GitHub App</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/New_projectRailway2.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Indicamos la cuenta de GitHub donde esta el proyecto</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/New_projectRailway3.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Indicamos solo el repositorio seleccionado y seleccionamos el repositorio de nuestro proyecto. Seguidamente pinchamos en Install & Authorize:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/New_projectRailway4.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Ahora volvemos a señalar el proyecto de GitHub del menu</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/New_projectRailway5.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Y antes de hacer el deploy vamos a configurar las variables de entorno:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/New_projectRailway6.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Pinchamos en el Raw Editor:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/VariablesEntornoRailway.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Y pegamos de nuestro archivo .env las dos variables que necesitaremos:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/VariablesEntornoRailway2.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Y ya tendriamos configurado las variables de entorno. Y hacemos click en Delpoy:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/VariablesEntornoRailway3.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Una vez que ha terminado de instalar la aplicación, pinchamos en la pestaña de settings:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/SettingsRailway.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>
+    En esta pestaña vamos a dar atención a dos partes:
+    <ul><li>1.- Branch connected to production. <br> En esta seccion indicamos que branch de nuestro respositorio esta conectado con el deploy. De tal manera que cada vez que actualicemos esa rama se actualizará la versión del servidor.</li><li>2.- Public networking. <br> En esta seccion creamos el dominio desde el que accederemos a la aplicación.</li></ul>
+    </p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/GenerateDomineRailway.png" alt="JuveYell" width="600px">
+    </p>
+    <p>En nuestro caso dejaremos el branch main, y haremos click sobre Generate Domain</p>
+  </li>
+  <li>
+    <p>Es posible que nos pida un puerto, podriamos indicarle uno o simplemente cancelar esta operación:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/GenerateDominePuertoRailway1.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Y seguidamente nos va a sugerir nuestro dominio. Nosotros podriamos pinchar en el boton de edición y cambiar el nombre del dominio sugeriada. Claro la parte que no es fija. Y nos indicara con el check en verde si esta disponible. Cambiamos el nombre y pinchamos el botón de update:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/GenerateDomineRailway2.png" alt="JuveYell" width="600px">
+    </p>
+    <p>Una vez que veamos que el nombre esta disponible pinchamos el botón de update. Y ahora habría que esperar unos 10 minutos a que la url este disponible y podamos hacer click sobre ella. Y si vemos esta pantalla o algo parecido, estaria ya disponible:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/PruebaUrlRailway.png" alt="JuveYell" width="600px">
+    </p>
+  </li>
+  <li>
+    <p>Ya lo unico que nos quedaria es probar en postman la url:</p>
+    <p style = 'text-align:center;'>
+      <img src="./docum/pruebaPostman.png" alt="JuveYell" width="600px">
+    </p>
+  </li></ul>

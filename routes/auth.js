@@ -17,7 +17,7 @@ const { validarJWT } = require("../middlewares/validar-jwt");
 
 // Crear ruta de respuesta. Cuando se llame al servidor (localhost:4000 o localhost:4000/)
 // se obtendrá la respuesta { OK: true }
-router.get("/", getAuths);
+router.get("/auths", getAuths);
 
 router.post(
   "/new",
