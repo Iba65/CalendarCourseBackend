@@ -84,7 +84,7 @@ const LoginAuth = async (req, res = response) => {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      msg: "Error al crear el usuario. Hable con el administrador de la base de datos, o intentelo de nuevo mas tarde.",
+      msg: "Error del servidor en loguin. Hable con el administrador de la base de datos, o intentelo de nuevo mas tarde.",
     });
   }
 };
