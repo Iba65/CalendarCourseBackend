@@ -23,7 +23,7 @@ router.use(validarJWT);
 router.get("/", getEvents);
 
 router.post(
-  "/",
+  "/new",
   [
     check("title", "El titulo es obligatorio").notEmpty(),
     check("start", "Fecha de inicio es obligatoria").custom(isDate),

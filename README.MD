@@ -904,3 +904,20 @@ git push -u origin main
       <img src="./docum/pruebaPostman.png" alt="JuveYell" width="600px">
     </p>
   </li></ul>
+
+# Union de front-end con el back-end
+
+<p>Una vez que tenemos la aplicación del front preparada y hemos desarrollado toda las parte del back, estamos listos para unir las dos partes. Se debe recordar que para trabajar en local debemos de tener las dos aplicaciones funcionando, por lo que debemos de tener distintos puertos definidos en cada una de las aplicaciones para su ejecución.</p>
+<ul>
+<li>
+<p>
+  En primer lugar arranuemos nuestro back-end con <code style="color: cyan">npm run dev</code>.
+</p>
+</li>
+<li>
+<p>
+  En segundo lugar arranuemos nuestro front-end con <code style="color: cyan">yarn dev</code>.
+</p>
+</li>
+</ul>
+<p>Despues de esto vamos a terminar de configurar la parte del front. Sirvase para eso ver el archivo <code style="color: yellow">README.MD</code> de la parte del front de este proyecto.</p>
