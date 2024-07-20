@@ -12,6 +12,7 @@ const getEvents = async (req, res = response) => {
 };
 
 const newEvent = async (req, res = response) => {
+  console.log("nuevo evento");
   const evento = new Event(req.body);
   try {
     evento.user = req.uid;
